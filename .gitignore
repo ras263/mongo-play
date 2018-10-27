@@ -135,6 +135,7 @@ nbdist/
 .idea/modules.xml
 .idea/misc.xml
 .idea/json2java.xml
+.idea/vcs.xml
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
