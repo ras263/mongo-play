@@ -3,10 +3,14 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import db.PersonRepository;
 import db.PersonRepositoryImpl;
 import model.Person;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,20 +19,19 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
- * Main entry point.
+ * Just some testing.
  *
  * Created by Lakhno Anton
- * at 15:48 27.10.2018.
+ * at 23:48 28.10.2018.
  *
  * @author Lakhno Anton
  */
-public class Main {
+public class MainTest {
 
-	/**
-	 * Contains some drafts.
-	 * @param args Default program arguments.
-	 */
-	public static void main(String[] args) {
+	PersonRepository rep;
+
+	@Before
+	public void setUp() throws Exception {
 		CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
 				fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 		MongoClientSettings settings = MongoClientSettings.builder()
@@ -37,43 +40,46 @@ public class Main {
 		MongoClient mongoClient = MongoClients.create(settings);
 		MongoDatabase test = mongoClient.getDatabase("test");
 		test.getCollection("Person").drop();
+		rep = new PersonRepositoryImpl(test);
+	}
 
+	@Test
+	public void testInteraction() throws Exception {
+		// given
 		Person vasia = new Person("Vasiliy", "Pupkin", 26, "M");
 		Person vanya = new Person("Ivan", "Ivanov", 25, "M");
 		Person petya = new Person("Petr", "Semenov", 27, "M");
 		Person fedya = new Person("Fedor", "Smolov", 29, "M");
-
-		PersonRepositoryImpl personRepository = new PersonRepositoryImpl(test);
 		// clear all.
-		personRepository.clearAll();
+		rep.clearAll();
+
+		// when
 		// checking by 'get all'.
-		List<Person> all = personRepository.getAll();
+		List<Person> all = rep.getAll();
 		System.out.println("Empty collection: " + all);
 		// insert all
-		personRepository.insertMany(Arrays.asList(vasia, vanya, petya, fedya));
+		rep.insertMany(Arrays.asList(vasia, vanya, petya, fedya));
 		// check again
-		all = personRepository.getAll();
+		all = rep.getAll();
 		System.out.println("Collection after inserting many: " + all);
 		// Get by name
-		List<Person> nikitkas = personRepository.getByName("Nikitka");
-		System.out.println("Found with name 'Nikitka': " + nikitkas);
+		List<Person> vasiliys = rep.getByName("Vasiliy");
+		System.out.println("Found with name 'Vasiliy': " + vasiliys);
 		// get count
-		Long count = personRepository.count();
+		Long count = rep.count();
 		System.out.println("Count of entities: " + count);
 		// Try to check uniqueness
 		try {
-			personRepository.insert(vasia);
+			rep.insert(vasia);
 		} catch (MongoWriteException e) {
 			System.out.println("Error occurred while trying to insert a person with duplicated unique key. Cause: "
 					+ e.getMessage());
 		}
-		count = personRepository.count();
+		count = rep.count();
 		System.out.println("Count after repeating insert operation with same entity: " + count);
-
-		PersonRepositoryImpl personRepository1 = new PersonRepositoryImpl(test);
-		System.out.println(personRepository1.getAll());
-
-		System.out.println("All count again: " + personRepository.count());
+		// then
+		Assert.assertEquals(1, vasiliys.size());
+		Assert.assertEquals(4L, count.longValue());
 	}
 
 }
