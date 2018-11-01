@@ -39,6 +39,7 @@ public class Main {
 		test.getCollection("Person").drop();
 
 		Person vasia = new Person("Vasiliy", "Pupkin", 26, "M");
+		vasia.setAge(26); // just testing the 'providedCompile' configuration
 		Person vanya = new Person("Ivan", "Ivanov", 25, "M");
 		Person petya = new Person("Petr", "Semenov", 27, "M");
 		Person fedya = new Person("Fedor", "Smolov", 29, "M");

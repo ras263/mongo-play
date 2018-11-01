@@ -1,7 +1,3 @@
-plugins {
-    id 'war'
-}
-
 group 'com.lakhno'
 version '1.0-SNAPSHOT'
 
@@ -31,6 +27,13 @@ sourceSets {
             srcDir 'src/test/resources'
         }
     }
+}
+
+sourceSets.main.compileClasspath += configurations.providedCompile
+sourceSets.test.compileClasspath += configurations.providedCompile
+
+configurations {
+    providedCompile
 }
 
 jar {
