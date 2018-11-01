@@ -29,12 +29,12 @@ sourceSets {
     }
 }
 
-sourceSets.main.compileClasspath += configurations.providedCompile
-sourceSets.test.compileClasspath += configurations.providedCompile
-
 configurations {
     providedCompile
 }
+
+sourceSets.main.compileClasspath += configurations.providedCompile
+sourceSets.test.compileClasspath += configurations.providedCompile
 
 jar {
     manifest {
